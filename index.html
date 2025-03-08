@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Portance St</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, button {
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .back-button {
+            background-color: #f44336;
+        }
+        .back-button:hover {
+            background-color: #d32f2f;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur de Portance St</h1>
+        
+        <!-- Étape 1: Classe de sol et Zone -->
+        <div id="step1" class="form-group">
+            <label for="soil-class">Classe du sol :</label>
+            <select id="soil-class">
+                <option value="">Sélectionnez...</option>
+                <option value="I">I</option>
+                <option value="II">II</option>
+                <option value="III">III</option>
+                <option value="IV">IV</option>
+            </select>
+            
+            <label for="zone-type">Type de zone :</label>
+            <select id="zone-type">
+                <option value="">Sélectionnez...</option>
+                <option value="inondable">Zone inondable ou nappe proche (&lt; à 1m)</option>
+                <option value="non-inondable">Hors zone inondable ou nappe profonde (&gt;à 1m)</option>
+            </select>
+            
+            <button id="next-step1">Continuer</button>
+        </div>
+        
+        <!-- Étape 2: Environnement climatique (pour zone non-inondable) -->
+        <div id="step2" class="form-group hidden">
+            <label for="climate">Environnement climatique :</label>
+            <select id="climate">
+                <option value="">Sélectionnez...</option>
+                <option value="H-h">H et h</option>
+                <option value="a">a</option>
+                <option value="d">d</option>
+            </select>
+            
+            <button id="next-step2">Continuer</button>
+            <button id="back-step2" class="back-button">Retour</button>
+        </div>
+        
+        <!-- Étape 3: Dispositifs de drainage (pour H et h ou a) -->
+        <div id="step3" class="form-group hidden">
+            <label for="drainage">Dispositifs de drainage :</label>
+            <select id="drainage">
+                <option value="">Sélectionnez...</option>
+                <option value="type1">Type 1</option>
+                <option value="type2">Type 2</option>
+            </select>
+            
+            <button id="next-step3">Continuer</button>
+            <button id="back-step3" class="back-button">Retour</button>
+        </div>
+        
+        <!-- Résultat final -->
+        <div id="result" class="result hidden">
+            <h2>Résultat :</h2>
+            <p id="result-text"></p>
+            <button id="restart" class="back-button">Recommencer</button>
+        </div>
+    </div>
+
+    <script>
+        // Références aux éléments du DOM
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const result = document.getElementById('result');
+        
+        const soilClass = document.getElementById('soil-class');
+        const zoneType = document.getElementById('zone-type');
+        const climate = document.getElementById('climate');
+        const drainage = document.getElementById('drainage');
+        
+        const nextStep1 = document.getElementById('next-step1');
+        const nextStep2 = document.getElementById('next-step2');
+        const nextStep3 = document.getElementById('next-step3');
+        
+        const backStep2 = document.getElementById('back-step2');
+        const backStep3 = document.getElementById('back-step3');
+        const restart = document.getElementById('restart');
+        
+        const resultText = document.getElementById('result-text');
+        
+        // Gestion des événements
+        nextStep1.addEventListener('click', function() {
+            if (soilClass.value === "" || zoneType.value === "") {
+                alert("Veuillez sélectionner la classe du sol et le type de zone.");
+                return;
+            }
+            
+            if (zoneType.value === "inondable") {
+                // Zone inondable - afficher directement le résultat
+                showResult();
+            } else {
+                // Zone non inondable - passer à l'étape 2
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+            }
+        });
+        
+        nextStep2.addEventListener('click', function() {
+            if (climate.value === "") {
+                alert("Veuillez sélectionner l'environnement climatique.");
+                return;
+            }
+            
+            if (climate.value === "d") {
+                // Environnement d - afficher directement le résultat
+                showResult();
+            } else {
+                // Environnement H et h ou a - passer à l'étape 3
+                step2.classList.add('hidden');
+                step3.classList.remove('hidden');
+            }
+        });
+        
+        nextStep3.addEventListener('click', function() {
+            if (drainage.value === "") {
+                alert("Veuillez sélectionner le dispositif de drainage.");
+                return;
+            }
+            
+            // Afficher le résultat
+            showResult();
+        });
+        
+        backStep2.addEventListener('click', function() {
+            step2.classList.add('hidden');
+            step1.classList.remove('hidden');
+        });
+        
+        backStep3.addEventListener('click', function() {
+            step3.classList.add('hidden');
+            step2.classList.remove('hidden');
+        });
+        
+        restart.addEventListener('click', function() {
+            result.classList.add('hidden');
+            step1.classList.remove('hidden');
+            
+            // Réinitialiser les sélections
+            soilClass.value = "";
+            zoneType.value = "";
+            climate.value = "";
+            drainage.value = "";
+        });
+        
+        // Fonction pour déterminer le résultat
+        function showResult() {
+            let portance = "";
+            const soil = soilClass.value;
+            
+            if (zoneType.value === "inondable") {
+                // Zone inondable ou nappe proche
+                if (soil === "I") portance = "St0";
+                else if (soil === "II") portance = "St1";
+                else if (soil === "III") portance = "St2";
+                else if (soil === "IV") portance = "St2 ou plus";
+            } else {
+                // Hors zone inondable ou nappe profonde
+                if (climate.value === "H-h") {
+                    if (soil === "I") {
+                        if (drainage.value === "type2") portance = "St0";
+                        else portance = "St1 (D) ou St2 (R)";
+                    } else if (soil === "II") {
+                        if (drainage.value === "type2") portance = "St1";
+                        else portance = "St2";
+                    } else if (soil === "III" || soil === "IV") {
+                        portance = "St3 à St4";
+                    }
+                } else if (climate.value === "a") {
+                    if (soil === "I") {
+                        if (drainage.value === "type2") portance = "St1";
+                        else portance = "St2";
+                    } else if (soil === "II") {
+                        if (drainage.value === "type2") portance = "St2";
+                        else portance = "St3";
+                    } else if (soil === "III" || soil === "IV") {
+                        portance = "St3 à St4";
+                    }
+                } else if (climate.value === "d") {
+                    if (soil === "I") portance = "St3";
+                    else if (soil === "II") portance = "St3";
+                    else if (soil === "III" || soil === "IV") portance = "St3 à St4";
+                }
+            }
+            
+            // Afficher le résultat
+            resultText.textContent = `La portance pour les paramètres sélectionnés est : ${portance}`;
+            
+            // Cacher toutes les étapes et afficher le résultat
+            step1.classList.add('hidden');
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
+            result.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
