@@ -5,64 +5,260 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur de Portance St</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        select, button {
-            padding: 8px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f0f8ff;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .back-button {
-            background-color: #f44336;
-        }
-        .back-button:hover {
-            background-color: #d32f2f;
-        }
-        .hidden {
-            display: none;
-        }
+        /* Professional color palette */
+:root {
+    --primary: #2c3e50;
+    --primary-light: #34495e;
+    --secondary: #3498db;
+    --secondary-light: #5dade2;
+    --accent: #1abc9c;
+    --accent-hover: #16a085;
+    --danger: #e74c3c;
+    --danger-hover: #c0392b;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --text: #333333;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--light);
+    color: var(--text);
+    transition: background-color 0.5s ease;
+}
+
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow);
+    transform: translateY(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.container:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+}
+
+h1 {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: var(--secondary);
+    transition: all 0.5s ease;
+    transform: translateX(-50%);
+    animation: lineExpand 1s ease forwards 0.5s;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.form-group.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary);
+    transition: color 0.3s ease;
+}
+
+select, button {
+    padding: 12px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+select {
+    appearance: none;
+    background: white url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z' fill='%232c3e50'/%3E%3C/svg%3E") no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    padding-right: 40px;
+}
+
+select:focus, button:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+}
+
+select:hover {
+    border-color: var(--secondary-light);
+}
+
+button {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+button:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+button:hover {
+    background-color: var(--accent-hover);
+}
+
+button:active:after {
+    animation: ripple 0.6s ease-out;
+}
+
+.back-button {
+    background-color: var(--danger);
+}
+
+.back-button:hover {
+    background-color: var(--danger-hover);
+}
+
+.result {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--light);
+    border-radius: 6px;
+    font-weight: 500;
+    border-left: 4px solid var(--accent);
+    box-shadow: 0 2px 8px var(--shadow);
+    animation: slideUp 0.5s ease-out;
+}
+
+.result h2 {
+    color: var(--primary);
+    margin-top: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes lineExpand {
+    from { width: 0; }
+    to { width: 100px; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    20% {
+        transform: scale(25, 25);
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
+/* Add animation classes */
+.slide-in {
+    animation: slideUp 0.5s ease-out;
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease-out;
+}
+
+/* Transition between steps */
+.form-group.entering {
+    animation: slideUp 0.5s ease-out;
+}
+
+.form-group.exiting {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to { 
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+.ripple {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+/* Validation error shake animation */
+.shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
     </style>
 </head>
 <body>
@@ -260,6 +456,124 @@
             step3.classList.add('hidden');
             result.classList.remove('hidden');
         }
+        document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const result = document.getElementById('result');
+    
+    // Navigation buttons
+    const nextStep1 = document.getElementById('next-step1');
+    const nextStep2 = document.getElementById('next-step2');
+    const nextStep3 = document.getElementById('next-step3');
+    const backStep2 = document.getElementById('back-step2');
+    const backStep3 = document.getElementById('back-step3');
+    const restart = document.getElementById('restart');
+    
+    // Form inputs
+    const soilClass = document.getElementById('soil-class');
+    const zoneType = document.getElementById('zone-type');
+    const climate = document.getElementById('climate');
+    const drainage = document.getElementById('drainage');
+    const resultText = document.getElementById('result-text');
+    
+    // Animation function for transitioning between steps
+    function transitionTo(fromElement, toElement) {
+        // Add exiting class to current element
+        fromElement.classList.add('exiting');
+        
+        // After animation completes, hide current and show next
+        setTimeout(() => {
+            fromElement.classList.remove('exiting');
+            fromElement.classList.add('hidden');
+            
+            toElement.classList.remove('hidden');
+            toElement.classList.add('entering');
+            
+            // Remove the entering class after animation completes
+            setTimeout(() => {
+                toElement.classList.remove('entering');
+            }, 500);
+        }, 300);
+    }
+    
+    // Step 1 to Step 2
+    nextStep1.addEventListener('click', function() {
+        if (soilClass.value && zoneType.value) {
+            transitionTo(step1, step2);
+        } else {
+            // Shake animation for validation error
+            step1.classList.add('shake');
+            setTimeout(() => step1.classList.remove('shake'), 500);
+        }
+    });
+    
+    // Step 2 to Step 3
+    nextStep2.addEventListener('click', function() {
+        if (climate.value) {
+            transitionTo(step2, step3);
+        } else {
+            step2.classList.add('shake');
+            setTimeout(() => step2.classList.remove('shake'), 500);
+        }
+    });
+    
+    // Step 3 to Result
+    nextStep3.addEventListener('click', function() {
+        if (drainage.value) {
+            // Calculate result (placeholder logic)
+            let resultValue = `Classe de sol: ${soilClass.value}, Zone: ${zoneType.value}, 
+                              Climat: ${climate.value}, Drainage: ${drainage.value}`;
+            resultText.textContent = resultValue;
+            
+            transitionTo(step3, result);
+        } else {
+            step3.classList.add('shake');
+            setTimeout(() => step3.classList.remove('shake'), 500);
+        }
+    });
+    
+    // Back buttons
+    backStep2.addEventListener('click', function() {
+        transitionTo(step2, step1);
+    });
+    
+    backStep3.addEventListener('click', function() {
+        transitionTo(step3, step2);
+    });
+    
+    // Restart button
+    restart.addEventListener('click', function() {
+        // Reset form values
+        soilClass.value = '';
+        zoneType.value = '';
+        climate.value = '';
+        drainage.value = '';
+        
+        transitionTo(result, step1);
+    });
+    
+    // Add ripple effect to buttons
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
+            
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
     </script>
 </body>
 </html>
